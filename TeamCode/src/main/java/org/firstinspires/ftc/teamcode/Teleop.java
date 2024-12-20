@@ -32,7 +32,7 @@ public class Teleop extends LinearOpMode {
         //Set them to the correct modes
         //This reverses the motor direction
         m1.setDirection(DcMotorSimple.Direction.REVERSE);
-        m3.setDirection(DcMotorSimple.Direction.REVERSE);
+        //m3.setDirection(DcMotorSimple.Direction.REVERSE);
 
         //This resets the encoder values when the code is initialized
         m1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
