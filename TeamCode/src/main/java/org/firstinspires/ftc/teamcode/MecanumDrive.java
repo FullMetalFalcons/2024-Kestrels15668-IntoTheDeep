@@ -63,10 +63,10 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive motor setup
-        public String leftFrontDriveName = "leftFront";
-        public String leftBackDriveName = "leftBack";
-        public String rightFrontDriveName = "rightFront";
-        public String rightBackDriveName = "rightBack";
+        public String leftFrontDriveName = "front_left";
+        public String leftBackDriveName = "back_left";
+        public String rightFrontDriveName = "front_right";
+        public String rightBackDriveName = "back_right";
 
         public DcMotorSimple.Direction leftFrontDriveDirection = DcMotorSimple.Direction.REVERSE;
         public DcMotorSimple.Direction leftBackDriveDirection = DcMotorSimple.Direction.REVERSE;

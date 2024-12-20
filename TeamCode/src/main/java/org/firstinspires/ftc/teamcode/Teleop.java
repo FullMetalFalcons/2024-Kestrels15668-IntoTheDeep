@@ -44,6 +44,7 @@ public class Teleop extends LinearOpMode {
         m1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         m2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         m3.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        m4.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rotator.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //This lets you look at encoder values while the OpMode is active
@@ -93,6 +94,13 @@ public class Teleop extends LinearOpMode {
             m2.setPower(p2);
             m3.setPower(p3);
             m4.setPower(p4);
+
+
+            telemetry.addData("M1", m1.getPower());
+            telemetry.addData("M2", m2.getPower());
+            telemetry.addData("M3", m3.getPower());
+            telemetry.addData("M4", m4.getPower());
+            telemetry.update();
 
 
             if (clawOpen)
