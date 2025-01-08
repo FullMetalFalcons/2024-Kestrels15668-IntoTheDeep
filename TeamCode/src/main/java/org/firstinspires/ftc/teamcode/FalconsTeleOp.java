@@ -4,13 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
 public class FalconsTeleOp extends LinearOpMode {
     //Initialize motors, servos, sensors, imus, etc.
-    DcMotorEx motorLF, motorRF, motorLB, motorRB;
-    // TODO: Uncomment the following line if you are using servos
-    //Servo Claw;
+    DcMotorEx motorLF, motorRF, motorLB, motorRB, Tower, Slide, Arm;
+    Servo Claw;
 
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
@@ -25,9 +25,11 @@ public class FalconsTeleOp extends LinearOpMode {
         motorLB = (DcMotorEx) hardwareMap.dcMotor.get(DRIVE_PARAMS.leftBackDriveName);
         motorRF = (DcMotorEx) hardwareMap.dcMotor.get(DRIVE_PARAMS.rightFrontDriveName);
         motorRB = (DcMotorEx) hardwareMap.dcMotor.get(DRIVE_PARAMS.rightBackDriveName);
+        Tower = (DcMotorEx) hardwareMap.dcMotor.get("lift");
+        Slide = (DcMotorEx) hardwareMap.dcMotor.get("slide");
+        Arm = (DcMotorEx) hardwareMap.dcMotor.get("pivot");
 
-        // Use the following line as a template for defining new servos
-        //Claw = (Servo) hardwareMap.servo.get("claw");
+        Claw = (Servo) hardwareMap.servo.get("claw");
 
         //Set them to the correct modes
         //This reverses the motor direction
@@ -48,6 +50,10 @@ public class FalconsTeleOp extends LinearOpMode {
         motorLB.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorRF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorRB.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+        Tower.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        Slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        Arm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //This lets you look at encoder values while the OpMode is active
         //If you have a STOP_AND_RESET_ENCODER, make sure to put this below it
@@ -96,6 +102,27 @@ public class FalconsTeleOp extends LinearOpMode {
             motorRF.setPower(powerRF);
             motorRB.setPower(powerRB);
 
+
+
+            // Controls for the vertical actuator
+            Tower.setPower(-gamepad2.left_stick_y);
+
+            // Controls for the arm
+            Arm.setPower(-gamepad2.right_stick_y);
+
+            // Controls for the rotating actuator
+            if (gamepad2.right_trigger > 0) {
+                Slide.setPower(gamepad2.right_trigger);
+            } else {
+                Slide.setPower(-gamepad2.left_trigger);
+            }
+
+            // Controls for the claw
+            if (gamepad2.right_bumper) {
+                Claw.setPosition(0.0);
+            } else if (gamepad2.left_bumper) {
+                Claw.setPosition(1.0);
+            }
 
 
             // If you want to print information to the Driver Station, use telemetry
