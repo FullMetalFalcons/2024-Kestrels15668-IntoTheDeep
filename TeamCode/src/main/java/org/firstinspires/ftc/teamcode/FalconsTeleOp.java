@@ -112,9 +112,9 @@ public class FalconsTeleOp extends LinearOpMode {
 
             // Controls for the rotating actuator
             if (gamepad2.right_trigger > 0) {
-                Slide.setPower(gamepad2.right_trigger);
+                Tower.setPower(gamepad2.right_trigger);
             } else {
-                Slide.setPower(-gamepad2.left_trigger);
+                Tower.setPower(-gamepad2.left_trigger);
             }
 
             // Controls for the claw
@@ -122,6 +122,11 @@ public class FalconsTeleOp extends LinearOpMode {
                 Claw.setPosition(0.0);
             } else if (gamepad2.left_bumper) {
                 Claw.setPosition(1.0);
+            }
+
+            if (gamepad2.left_trigger) {
+                //GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD
+
             }
 
 
