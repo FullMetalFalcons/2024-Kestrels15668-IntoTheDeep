@@ -123,12 +123,7 @@ public class FalconsTeleOp extends LinearOpMode {
             } else if (gamepad2.left_bumper) {
                 Claw.setPosition(1.0);
             }
-
-            if (gamepad2.left_trigger) {
-                //GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD GET OUT OF MY HEAD
-
-            }
-
+            
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed
