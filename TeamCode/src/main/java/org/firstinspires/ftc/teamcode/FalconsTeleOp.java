@@ -31,6 +31,9 @@ public class FalconsTeleOp extends LinearOpMode {
 
         Claw = (Servo) hardwareMap.servo.get("claw");
 
+        //thingy ma bobber
+        public boolean isClawActive = false;
+
         //Set them to the correct modes
         //This reverses the motor direction
         // This data is also set at the top of MecanumDrive, for the same reasons as above
@@ -118,11 +121,17 @@ public class FalconsTeleOp extends LinearOpMode {
             }
 
             // Controls for the claw
-            if (gamepad2.right_bumper) {
-                Claw.setPosition(0.0);
-            } else if (gamepad2.left_bumper) {
-                Claw.setPosition(1.0);
+            if (gamepad2.Y, isClawActive)   {
+                if (isClawActive == false) {
+                    Claw.setPosition(0.0);
+                    isClawActive = true;
+                }
+                if (isClawActive == true) {
+                    Claw.setPosition(1.0);
+                    isClawActive = false;
+                }
             }
+
             
 
             // If you want to print information to the Driver Station, use telemetry
