@@ -121,7 +121,7 @@ public class FalconsTeleOp extends LinearOpMode {
             }
 
             // Controls for the claw
-            if (gamepad2.Y, isClawActive)   {
+            if (gamepad2.y, isClawActive)   {
                 if (isClawActive == false) {
                     Claw.setPosition(0.0);
                     isClawActive = true;
