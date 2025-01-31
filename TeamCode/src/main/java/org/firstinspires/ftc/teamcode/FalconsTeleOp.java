@@ -14,6 +14,9 @@ public class FalconsTeleOp extends LinearOpMode {
 
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
+    // Claw toggle variables
+    public boolean clawWasPressed = false;
+    public boolean isClawOpen = false;
 
     // The following code will run as soon as "INIT" is pressed on the Driver Station
     public void runOpMode() {
@@ -30,9 +33,6 @@ public class FalconsTeleOp extends LinearOpMode {
         Arm = (DcMotorEx) hardwareMap.dcMotor.get("pivot");
 
         Claw = (Servo) hardwareMap.servo.get("claw");
-
-        //thingy ma bobber
-        public boolean isClawActive = false;
 
         //Set them to the correct modes
         //This reverses the motor direction
@@ -107,31 +107,30 @@ public class FalconsTeleOp extends LinearOpMode {
 
 
 
-            // Controls for the vertical actuator
-            Tower.setPower(-gamepad2.left_stick_y);
-
             // Controls for the arm
-            Arm.setPower(-gamepad2.right_stick_y);
+            Arm.setPower(-gamepad2.left_stick_y);
+
+            // Controls for the lead screw
+            Slide.setPower(gamepad2.right_stick_y);
 
             // Controls for the rotating actuator
-            if (gamepad2.right_trigger > 0) {
-                Tower.setPower(gamepad2.right_trigger);
+            if (gamepad2.right_bumper) {
+                Tower.setPower(1.0);
             } else {
-                Tower.setPower(-gamepad2.left_trigger);
+                Tower.setPower(-gamepad2.right_trigger);
             }
 
-            // Controls for the claw
-            if (gamepad2.y, isClawActive)   {
-                if (isClawActive == false) {
+            // Toggle controls for the claw
+            if (gamepad2.y && !clawWasPressed) {
+                if (isClawOpen) {
                     Claw.setPosition(0.0);
-                    isClawActive = true;
-                }
-                if (isClawActive == true) {
-                    Claw.setPosition(1.0);
-                    isClawActive = false;
+                    isClawOpen = false;
+                } else {
+                    Claw.setPosition(0.4);
+                    isClawOpen = true;
                 }
             }
-
+            clawWasPressed = gamepad2.y;
             
 
             // If you want to print information to the Driver Station, use telemetry
