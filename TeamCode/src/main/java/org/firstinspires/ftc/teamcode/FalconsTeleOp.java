@@ -131,7 +131,7 @@ public class FalconsTeleOp extends LinearOpMode {
                 }
             }
             clawWasPressed = gamepad2.y;
-            
+
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed
