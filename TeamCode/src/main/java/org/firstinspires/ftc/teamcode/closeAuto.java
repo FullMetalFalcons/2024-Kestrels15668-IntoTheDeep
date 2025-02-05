@@ -66,7 +66,7 @@ public class closeAuto extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-                        new ArmRotatorToPosition(600, 0),
+                        //new ArmRotatorToPosition(600, 0),
                         auto
                 )
         );

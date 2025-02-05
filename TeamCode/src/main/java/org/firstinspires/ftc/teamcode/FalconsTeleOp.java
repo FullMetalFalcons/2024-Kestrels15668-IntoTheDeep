@@ -10,13 +10,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class FalconsTeleOp extends LinearOpMode {
     //Initialize motors, servos, sensors, imus, etc.
     DcMotorEx motorLF, motorRF, motorLB, motorRB, Tower, Slide, Arm;
-    Servo Claw;
+    Servo Claw, ClawRotator;
 
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
     // Claw toggle variables
     public boolean clawWasPressed = false;
     public boolean isClawOpen = false;
+    public boolean clawRotated = false; //True is vertical, false is horizontal
+    public int clawRotationVertical = 0;
+    public int getClawRotationHorizontial = 0;
 
     // The following code will run as soon as "INIT" is pressed on the Driver Station
     public void runOpMode() {
@@ -31,6 +34,8 @@ public class FalconsTeleOp extends LinearOpMode {
         Tower = (DcMotorEx) hardwareMap.dcMotor.get("lift");
         Slide = (DcMotorEx) hardwareMap.dcMotor.get("slide");
         Arm = (DcMotorEx) hardwareMap.dcMotor.get("pivot");
+
+        ClawRotator = (Servo) hardwareMap.servo.get("ClawRotator");
 
         Claw = (Servo) hardwareMap.servo.get("claw");
 
@@ -120,6 +125,18 @@ public class FalconsTeleOp extends LinearOpMode {
                 Tower.setPower(-gamepad2.right_trigger);
             }
 
+            // Toggle controls for the claw rotator
+            if (gamepad2.dpad_up) {
+                if (clawRotated) {
+                    ClawRotator.setPosition(clawRotationVertical);
+                    clawRotated = false;
+                } else {
+                    ClawRotator.setPosition(getClawRotationHorizontial);
+                    clawRotated = true;
+                }
+            }
+            }
+
             // Toggle controls for the claw
             if (gamepad2.y && !clawWasPressed) {
                 if (isClawOpen) {
@@ -142,5 +159,4 @@ public class FalconsTeleOp extends LinearOpMode {
             //telemetry.update();
 
         } // opModeActive loop ends
-    }
-} // end class
+    }  // end class
