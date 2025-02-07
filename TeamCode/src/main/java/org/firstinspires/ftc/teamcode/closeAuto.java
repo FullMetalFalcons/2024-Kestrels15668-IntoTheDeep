@@ -25,10 +25,10 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Autonomous
 public class closeAuto extends LinearOpMode {
     public void runOpMode() {
-        //KestrelArm kestrelArm = new KestrelArm(hardwareMap, telemetry);
+        KestrelArm kestrelArm = new KestrelArm(hardwareMap, telemetry);
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(34.6, 63.3, Math.toRadians(-90)));
 
-        //KestrelArm arm = new KestrelArm(hardwareMap, telemetry);
+        KestrelArm arm = new KestrelArm(hardwareMap, telemetry);
 
         Action auto;
 

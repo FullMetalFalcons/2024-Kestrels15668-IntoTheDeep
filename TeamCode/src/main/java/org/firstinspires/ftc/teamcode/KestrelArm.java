@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-/*import androidx.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
@@ -75,11 +75,9 @@ public class KestrelArm {
 
     }
 
-    public class Wait implements Action
+    public abstract class Wait implements Action
     {
         private double seconds;
 
     }
 }
-
- */

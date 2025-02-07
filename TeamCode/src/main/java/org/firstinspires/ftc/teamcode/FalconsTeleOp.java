@@ -16,6 +16,7 @@ public class FalconsTeleOp extends LinearOpMode {
 
     // Claw toggle variables
     public boolean clawWasPressed = false;
+    public boolean clawWasRotated = false;
     public boolean isClawOpen = false;
     public boolean clawRotated = false; //True is vertical, false is horizontal
     public int clawRotationVertical = 0;
@@ -126,7 +127,7 @@ public class FalconsTeleOp extends LinearOpMode {
             }
 
             // Toggle controls for the claw rotator
-            if (gamepad2.dpad_up) {
+            if (gamepad2.dpad_up && !clawWasRotated) {
                 if (clawRotated) {
                     ClawRotator.setPosition(clawRotationVertical);
                     clawRotated = false;
@@ -148,6 +149,8 @@ public class FalconsTeleOp extends LinearOpMode {
                 }
             }
             clawWasPressed = gamepad2.y;
+            clawWasRotated = gamepad2.dpad_up;
+
 
 
             // If you want to print information to the Driver Station, use telemetry
