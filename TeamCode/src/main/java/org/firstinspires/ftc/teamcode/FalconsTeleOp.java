@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp
 public class FalconsTeleOp extends LinearOpMode {
@@ -130,9 +131,11 @@ public class FalconsTeleOp extends LinearOpMode {
  /*           if (gamepad2.dpad_up && !clawWasRotated) {
                 if (clawRotated) {
                     ClawRotator.setPosition(clawRotationVertical);
+                    TimeUnit.SECONDS.sleep(1);
                     clawRotated = false;
                 } else {
                     ClawRotator.setPosition(getClawRotationHorizontial);
+                    TimeUnit.SECONDS.sleep(1);
                     clawRotated = true;
                 }
             } */
