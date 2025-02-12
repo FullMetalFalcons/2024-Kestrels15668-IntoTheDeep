@@ -19,8 +19,8 @@ public class FalconsTeleOp extends LinearOpMode {
     public boolean clawWasRotated = false;
     public boolean isClawOpen = false;
     public boolean clawRotated = false; //True is vertical, false is horizontal
-    public int clawRotationVertical = 0;
-    public int getClawRotationHorizontial = 0;
+    public double clawRotationVertical = 0.5;
+    public double getClawRotationHorizontial = -0.5;
 
     // The following code will run as soon as "INIT" is pressed on the Driver Station
     public void runOpMode() {
@@ -127,7 +127,7 @@ public class FalconsTeleOp extends LinearOpMode {
             }
 
             // Toggle controls for the claw rotator
-            if (gamepad2.dpad_up && !clawWasRotated) {
+ /*           if (gamepad2.dpad_up && !clawWasRotated) {
                 if (clawRotated) {
                     ClawRotator.setPosition(clawRotationVertical);
                     clawRotated = false;
@@ -135,7 +135,7 @@ public class FalconsTeleOp extends LinearOpMode {
                     ClawRotator.setPosition(getClawRotationHorizontial);
                     clawRotated = true;
                 }
-            }
+            } */
             }
 
             // Toggle controls for the claw
