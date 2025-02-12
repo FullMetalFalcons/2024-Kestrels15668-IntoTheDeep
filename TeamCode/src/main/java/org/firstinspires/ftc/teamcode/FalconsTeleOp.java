@@ -72,6 +72,8 @@ public class FalconsTeleOp extends LinearOpMode {
         motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        Claw.setPosition(0.4);
+
 
         // The program will pause here until the Play icon is pressed on the Driver Station
         waitForStart();
