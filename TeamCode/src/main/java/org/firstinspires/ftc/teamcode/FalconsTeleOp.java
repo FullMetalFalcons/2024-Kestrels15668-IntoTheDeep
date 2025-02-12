@@ -128,17 +128,17 @@ public class FalconsTeleOp extends LinearOpMode {
             }
 
             // Toggle controls for the claw rotator
- /*           if (gamepad2.dpad_up && !clawWasRotated) {
+              if (gamepad2.dpad_up && !clawWasRotated) {
                 if (clawRotated) {
                     ClawRotator.setPosition(clawRotationVertical);
-                    TimeUnit.SECONDS.sleep(1);
+                    //TimeUnit.SECONDS.sleep(1);
                     clawRotated = false;
                 } else {
                     ClawRotator.setPosition(getClawRotationHorizontial);
-                    TimeUnit.SECONDS.sleep(1);
+                    //TimeUnit.SECONDS.sleep(1);
                     clawRotated = true;
                 }
-            } */
+            }
             }
 
             // Toggle controls for the claw
