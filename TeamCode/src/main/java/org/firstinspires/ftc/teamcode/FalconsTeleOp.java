@@ -20,8 +20,8 @@ public class FalconsTeleOp extends LinearOpMode {
     public boolean clawWasRotated = false;
     public boolean isClawOpen = false;
     public boolean clawRotated = false; //True is vertical, false is horizontal
-    public double clawRotationVertical = 0.5;
-    public double getClawRotationHorizontial = -0.5;
+    public double clawRotationVertical = 0.35;
+    public double getClawRotationHorizontial = -0.35;
 
     // The following code will run as soon as "INIT" is pressed on the Driver Station
     public void runOpMode() {
@@ -72,7 +72,7 @@ public class FalconsTeleOp extends LinearOpMode {
         motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        Claw.setPosition(0.4);
+        Claw.setPosition(0.0);
 
 
         // The program will pause here until the Play icon is pressed on the Driver Station
@@ -115,7 +115,6 @@ public class FalconsTeleOp extends LinearOpMode {
             motorRB.setPower(powerRB);
 
 
-
             // Controls for the arm
             Arm.setPower(-gamepad2.left_stick_y);
 
@@ -130,7 +129,7 @@ public class FalconsTeleOp extends LinearOpMode {
             }
 
             // Toggle controls for the claw rotator
-              if (gamepad2.dpad_up && !clawWasRotated) {
+            if (gamepad2.dpad_up && !clawWasRotated) {
                 if (clawRotated) {
                     ClawRotator.setPosition(clawRotationVertical);
                     //TimeUnit.SECONDS.sleep(1);
@@ -141,7 +140,7 @@ public class FalconsTeleOp extends LinearOpMode {
                     clawRotated = true;
                 }
             }
-            }
+
 
             // Toggle controls for the claw
             if (gamepad2.y && !clawWasPressed) {
@@ -152,11 +151,12 @@ public class FalconsTeleOp extends LinearOpMode {
                     Claw.setPosition(0.4);
                     isClawOpen = true;
                 }
+
             }
             clawWasPressed = gamepad2.y;
             clawWasRotated = gamepad2.dpad_up;
 
-
+        }
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed

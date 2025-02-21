@@ -12,14 +12,13 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.concurrent.TimeUnit;
+
 public class KestrelArm {
 
     private DcMotorEx Tower, Slide, Arm;
-
     private Servo Claw;
 
-    public KestrelArm(HardwareMap hardwareMap, Telemetry telemetry)
-    {
+    public KestrelArm(HardwareMap hardwareMap, Telemetry telemetry) {
         Tower = (DcMotorEx) hardwareMap.dcMotor.get("lift");
         Slide = (DcMotorEx) hardwareMap.dcMotor.get("slide");
         Arm = (DcMotorEx) hardwareMap.dcMotor.get("pivot");
@@ -39,45 +38,54 @@ public class KestrelArm {
         Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    public class ArmRotatorToPosition implements Action {
-        private int rotatorPower;
-        private boolean rotInit = false;
-        private long startTimeNs;
-        private double seconds;
+    public void setClawPosition(double position) {
+        Claw.setPosition(position);
+    }
 
-        public ArmRotatorToPosition(int rotPower, double time) {
-            super();
-            seconds = time;
-            rotatorPower = rotPower;
+    public static class WaitAction implements Action {
+        private final long waitTimeNs;
+        private long startTimeNs;
+        private boolean started = false;
+
+        public WaitAction(double seconds) {
+            this.waitTimeNs = TimeUnit.MILLISECONDS.toNanos((long) (seconds * 1000));
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            if (!rotInit) {
+            if (!started) {
                 startTimeNs = System.nanoTime();
-                rotInit = true;
+                started = true;
             }
-            if (System.nanoTime() - startTimeNs > TimeUnit.MILLISECONDS.toNanos((long) (seconds * 1000))) {
-                Arm.setTargetPosition(rotatorPower);
-                Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                Arm.setPower(1);
-                return false;
-            }
-            else {
-                return true;
-            }
+            return System.nanoTime() - startTimeNs < waitTimeNs;
         }
-
-        public ArmRotatorToPosition armRotatorToPosition(int rotatorPower, double seconds)
-        {
-            return new ArmRotatorToPosition(rotatorPower, seconds);
-        }
-
     }
 
-    public abstract class Wait implements Action
-    {
-        private double seconds;
+    public static class ArmRotatorToPosition implements Action {
+        private final int rotatorTarget;
+        private final KestrelArm arm;
+        private final long timeLimitNs;
+        private long startTimeNs = 0;
+        private boolean started = false;
 
+        public ArmRotatorToPosition(KestrelArm arm, int rotTarget, double seconds) {
+            this.arm = arm;
+            this.rotatorTarget = rotTarget;
+            this.timeLimitNs = TimeUnit.MILLISECONDS.toNanos((long) (seconds * 1000));
+        }
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!started) {
+                startTimeNs = System.nanoTime();
+                started = true;
+                arm.Arm.setTargetPosition(rotatorTarget);
+                arm.Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm.Arm.setPower(1);
+            }
+
+            // Continue running while the arm is moving & within time limit
+            return arm.Arm.isBusy() && (System.nanoTime() - startTimeNs < timeLimitNs);
+        }
     }
 }
