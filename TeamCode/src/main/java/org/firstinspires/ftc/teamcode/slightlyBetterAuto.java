@@ -13,46 +13,63 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Config
 @Autonomous
-public class closeAuto extends LinearOpMode {
+public class slightlyBetterAuto extends LinearOpMode {
 
 
     public void runOpMode() {
         // Initialize subsystems
         KestrelArm kestrelArm = new KestrelArm(hardwareMap, telemetry);
         MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(34.6, 63.3, Math.toRadians(-90)));
+        KestrelArm.Claw.setPosition(0.4);
+        KestrelArm.ClawRotator.setPosition(0.03);
+        sleep(400);
 
-        // Create a wait action that waits for 3 seconds
+        //wait 3 seconds
         Action waitAction = new KestrelArm.WaitAction(3);
 
         // Build the first trajectory segment
         Action trajectory1 = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(70, 56), Math.toRadians(180))  // Move towards basket
+                .strafeToLinearHeading(new Vector2d(70, 56), Math.toRadians(-90))  // Move towards basket
                 .waitSeconds(0.6)
-                //.turn(Math.toRadians(933849384)) // Turn to basket
-                //.waitSeconds(0.5)
-                //.strafeToLinearHeading(new Vector2d(63, 49), Math.toRadians(0)) // Move backwards
-
-                // EXTEND ARM: Call the extendArm function here
-                .waitSeconds(0.5)  // Optional wait to let arm fully extend before proceeding
+                .turn(Math.toRadians(115)) // Turn to basket
+                .waitSeconds(0.5)
+                .strafeToLinearHeading(new Vector2d(65, 52), Math.toRadians(-90)) // Move backwards
+                .turn(Math.toRadians(160))
                 .build();
 
         // Build the arm movement action (moves arm to position 600 over 2 seconds)
-        Action armMove = new KestrelArm.ArmRotatorToPosition(kestrelArm, 50, 2.0);
+        Action armExtend = new KestrelArm.ArmRotatorToPosition(kestrelArm, 200, 2.0);
+
+        Action clawOpen = new KestrelArm.ClawAction(kestrelArm, 0.0);
+
+        Action clawClose = new KestrelArm.ClawAction(kestrelArm, 0.4);
+        Action armUnExtend = new KestrelArm.ArmRotatorToPosition(kestrelArm, 0, 2.0);
+
+        Action liftUp = new KestrelArm.LiftToPosition(kestrelArm, 200, 2.0); // Move lift up
+        Action liftDown = new KestrelArm.LiftToPosition(kestrelArm, 0, 2.0); // Lower lift
+
+        Action slideExtend = new KestrelArm.SlideToPosition(kestrelArm, 300, 2.0); // Extend slide
+        Action slideRetract = new KestrelArm.SlideToPosition(kestrelArm, 0, 2.0); // Retract slide
+
+
 
         // Build the second trajectory segment
-        Action trajectory2 = drive.actionBuilder(drive.pose)
-                .turn(Math.toRadians(40)) // Turn back to be perpendicular to start position
-                .waitSeconds(0.5)
-                .strafeToLinearHeading(new Vector2d(63, 42), Math.toRadians(0)) // Go backwards
-                .waitSeconds(0.5)
+        Action park = drive.actionBuilder(drive.pose)
+                .waitSeconds(2)
+                .strafeToLinearHeading(new Vector2d(-58.5, 60), Math.toRadians(-90))  //Park
                 .build();
 
         // Combine all actions into a single sequential action
         Action auto = new SequentialAction(
+                clawClose,
                 waitAction,    // Wait for 3 seconds before starting
-                trajectory1   // Execute the first trajectory segment
-                //armMove,       // Run the arm movement action
-                //trajectory2    // Execute the second trajectory segment
+                trajectory1,   // Execute the first trajectory segment
+                armExtend,       // Run the arm movement action
+                slideExtend,
+                liftUp,
+                clawOpen,
+                armUnExtend,
+                park    // Park, dumbass
         );
 
         waitForStart();
