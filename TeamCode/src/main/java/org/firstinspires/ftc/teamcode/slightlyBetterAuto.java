@@ -63,13 +63,13 @@ public class slightlyBetterAuto extends LinearOpMode {
         Action auto = new SequentialAction(
                 clawClose,
                 waitAction,    // Wait for 3 seconds before starting
-                trajectory1,   // Execute the first trajectory segment
-                armExtend,       // Run the arm movement action
+                trajectory1,
+                armExtend,
                 slideExtend,
                 liftUp,
                 clawOpen,
                 armUnExtend,
-                park    // Park, dumbass
+                park
         );
 
         waitForStart();

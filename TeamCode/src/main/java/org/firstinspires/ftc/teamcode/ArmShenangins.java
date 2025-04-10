@@ -9,6 +9,13 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+
+/*
+OKAY SO INFO FOR ANYONE READING RQ:
+The values of the claw are inverted, so 0.4 is closed unlike the teleop where 0.0 is closed, there is on explenation on why that I could find,
+but there is no way to change that
+ */
+
 @Config
 @Autonomous
 public class ArmShenangins extends LinearOpMode {

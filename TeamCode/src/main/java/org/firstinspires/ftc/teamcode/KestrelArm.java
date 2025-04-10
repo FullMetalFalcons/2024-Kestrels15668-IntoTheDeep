@@ -45,7 +45,7 @@ public class KestrelArm {
         Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
-    // ====== Power Control Methods (For Manual Control) ======
+    //Power Control Methods (For Manual Control, used for mainly testing)
 
     public void setLiftPower(double power) {
         Tower.setPower(power); // Move lift up/down
@@ -55,7 +55,7 @@ public class KestrelArm {
         Slide.setPower(power); // Move slide in/out
     }
 
-    // ====== Position Control Actions (For Autonomous) ======
+    //Position Control Actions (For Auto)
 
     public static class WaitAction implements Action {
         private final long waitTimeNs;
@@ -83,6 +83,7 @@ public class KestrelArm {
         private long startTimeNs = 0;
         private boolean started = false;
 
+        //Rotates Arm To Position
         public ArmRotatorToPosition(KestrelArm arm, int rotTarget, double seconds) {
             this.arm = arm;
             this.rotatorTarget = rotTarget;
@@ -98,7 +99,7 @@ public class KestrelArm {
                 arm.Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 arm.Arm.setPower(1);
             }
-            return arm.Arm.isBusy() /*&& (System.nanoTime() - startTimeNs < timeLimitNs)*/;
+            return arm.Arm.isBusy();
         }
     }
 
@@ -118,7 +119,7 @@ public class KestrelArm {
         }
     }
 
-    // ====== NEW: Lift & Slide Position Control ======
+    //Lift & Slide Position Control
 
     public static class LiftToPosition implements Action {
         private final int targetPosition;
