@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
 public class TrevorTeleop extends LinearOpMode {
@@ -81,7 +82,12 @@ public class TrevorTeleop extends LinearOpMode {
             // Set the desired powers based on joystick inputs (-1 to 1)
             powerX = gamepad1.left_stick_x;
             powerY = -gamepad1.left_stick_y;
-            powerAng = -gamepad1.right_stick_x;
+
+            if (gamepad1.right_stick_x != 0) {
+                powerAng = -gamepad1.right_stick_x;
+            } else {
+                powerAng = -gamepad2.right_stick_x;
+            }
 
             // Perform vector math to determine the desired powers for each wheel
             double powerLF = powerX + powerY - powerAng;
@@ -134,14 +140,16 @@ public class TrevorTeleop extends LinearOpMode {
             else {
                 servoWheelPower = 0.0;
             }
+            servoWheel1.setPower(servoWheelPower);
+            servoWheel2.setPower(-servoWheelPower);
+
             if (servoWristPosition <= 0) {
                 servoWristPosition = 0;
             }
             if (servoWristPosition >= 1) {
                 servoWristPosition = 1;
             }
-            servoWheel1.setPower(servoWheelPower);
-            servoWheel2.setPower(-servoWheelPower);
+
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed
