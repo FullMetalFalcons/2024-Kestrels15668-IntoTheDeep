@@ -15,7 +15,7 @@ public class TrevorTeleop extends LinearOpMode {
     // TODO: Uncomment the following line if you are using servos
     Servo servoWrist;
     CRServo servoWheel1, servoWheel2;
-    double servoWristPosition, servoWheelPower;
+    double servoWristPosition, servoWheelPower, armMin, armMax;
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
 
@@ -67,6 +67,8 @@ public class TrevorTeleop extends LinearOpMode {
         motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        armMin = 0;
+        armMax = 1;
 
         // The program will pause here until the Play icon is pressed on the Driver Station
         waitForStart();
@@ -143,11 +145,11 @@ public class TrevorTeleop extends LinearOpMode {
             servoWheel1.setPower(servoWheelPower);
             servoWheel2.setPower(-servoWheelPower);
 
-            if (servoWristPosition <= 0) {
-                servoWristPosition = 0;
+            if (servoWristPosition <= armMin) {
+                servoWristPosition = armMin;
             }
-            if (servoWristPosition >= 1) {
-                servoWristPosition = 1;
+            if (servoWristPosition >= armMax) {
+                servoWristPosition = armMax;
             }
 
 
