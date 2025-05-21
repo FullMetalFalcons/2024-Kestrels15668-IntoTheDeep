@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
 public class TrevorTeleop extends LinearOpMode {
@@ -15,7 +14,8 @@ public class TrevorTeleop extends LinearOpMode {
     // TODO: Uncomment the following line if you are using servos
     Servo servoWrist;
     CRServo servoWheel1, servoWheel2;
-    double servoWristPosition, servoWheelPower, armMin, armMax;
+    double servoWheelPower;
+    boolean servoWristPosition;
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
 
@@ -53,12 +53,16 @@ public class TrevorTeleop extends LinearOpMode {
         motorLB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motorRF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motorRB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motorArm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motorSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         //This makes the wheels tense up and stay in position when it is not moving, opposite is FLOAT
         motorLF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorLB.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorRF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorRB.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorArm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         //This lets you look at encoder values while the OpMode is active
         //If you have a STOP_AND_RESET_ENCODER, make sure to put this below it
@@ -66,9 +70,11 @@ public class TrevorTeleop extends LinearOpMode {
         motorLB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        armMin = 0;
-        armMax = 1;
+
+        servoWrist.setPosition(0.229);
 
         // The program will pause here until the Play icon is pressed on the Driver Station
         waitForStart();
@@ -88,7 +94,7 @@ public class TrevorTeleop extends LinearOpMode {
             if (gamepad1.right_stick_x != 0) {
                 powerAng = -gamepad1.right_stick_x;
             } else {
-                powerAng = -gamepad2.right_stick_x;
+                powerAng = -gamepad2.right_stick_x/10;
             }
 
             // Perform vector math to determine the desired powers for each wheel
@@ -117,20 +123,23 @@ public class TrevorTeleop extends LinearOpMode {
 
 
             // Operator Controls
-            motorArm.setPower(-gamepad2.left_stick_y);
-            motorSlide.setPower(-gamepad2.right_stick_y);
+            if (motorArm.getCurrentPosition() > -2584) {
+                motorArm.setPower(-gamepad2.right_stick_y);
+            } else {
+                motorArm.setPower(0);
+            }
+            motorSlide.setPower(gamepad2.left_stick_y);
 
             // Wrist Controls
-            if (gamepad2.left_trigger > 0) {
-                servoWristPosition -= gamepad2.left_trigger / 1000;
+            if (servoWristPosition && gamepad2.y) {
+                servoWrist.setPosition(.3655);
+                servoWristPosition = false;
             }
-            else if (gamepad2.right_trigger > 0) {
-                servoWristPosition += gamepad2.right_trigger / 1000;
+            else if (!servoWristPosition && gamepad2.y){
+                servoWrist.setPosition(.317);
+                servoWristPosition = true;
             }
-            servoWrist.setPosition(servoWristPosition);
 
-            telemetry.addData("ServoPosition", servoWristPosition);
-            telemetry.addData("PhysicalServoPosition", servoWrist.getPosition());
 
             // Claw Controls
             if (gamepad2.left_bumper) {
@@ -145,13 +154,6 @@ public class TrevorTeleop extends LinearOpMode {
             servoWheel1.setPower(servoWheelPower);
             servoWheel2.setPower(-servoWheelPower);
 
-            if (servoWristPosition <= armMin) {
-                servoWristPosition = armMin;
-            }
-            if (servoWristPosition >= armMax) {
-                servoWristPosition = armMax;
-            }
-
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed
@@ -159,6 +161,8 @@ public class TrevorTeleop extends LinearOpMode {
             // update() only needs to be run once and will "push" all of the added data
 
             //telemetry.addData("Label", "Information");
+            telemetry.addData("PhysicalServoPosition", servoWrist.getPosition());
+            telemetry.addData("arm", motorArm.getCurrentPosition());
 
             telemetry.update();
 
