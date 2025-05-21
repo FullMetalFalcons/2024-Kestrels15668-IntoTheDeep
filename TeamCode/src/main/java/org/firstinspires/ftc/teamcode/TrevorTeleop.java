@@ -136,7 +136,7 @@ public class TrevorTeleop extends LinearOpMode {
                 servoWristPosition = false;
             }
             else if (!servoWristPosition && gamepad2.y){
-                servoWrist.setPosition(.270);
+                servoWrist.setPosition(.265);
                 servoWristPosition = true;
             }
 
