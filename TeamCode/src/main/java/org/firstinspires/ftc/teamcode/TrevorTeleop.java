@@ -181,8 +181,8 @@ public class TrevorTeleop extends LinearOpMode {
             // update() only needs to be run once and will "push" all of the added data
 
             //telemetry.addData("Label", "Information");
-            telemetry.addData("PhysicalServoPosition", servoWrist.getPosition());
-            telemetry.addData("arm", motorArm.getCurrentPosition());
+            telemetry.addData("wristPosition", servoWrist.getPosition());
+            telemetry.addData("armPosition", motorArm.getCurrentPosition());
 
             telemetry.update();
 
