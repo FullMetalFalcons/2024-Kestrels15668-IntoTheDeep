@@ -14,7 +14,7 @@ public class TrevorTeleop extends LinearOpMode {
     // TODO: Uncomment the following line if you are using servos
     Servo servoWrist;
     CRServo servoWheel1, servoWheel2;
-    boolean servoWristPosition, lbPress, rbPress, lbToggle, rbToggle, prevLbPress, prevRbPress;
+    boolean servoWristPosition, lbPress, rbPress, lbToggle, rbToggle, prevLbPress, prevRbPress, lastY;
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
 
@@ -140,14 +140,16 @@ public class TrevorTeleop extends LinearOpMode {
             motorSlide.setPower(gamepad2.left_stick_y);
 
             // Wrist Controls
-            if (servoWristPosition && gamepad2.y) {
-                servoWrist.setPosition(.317);
-                servoWristPosition = false;
+            if (gamepad2.y && !lastY) {
+                if (servoWristPosition) {
+                    servoWrist.setPosition(.317);
+                    servoWristPosition = false;
+                } else {
+                    servoWrist.setPosition(.265);
+                    servoWristPosition = true;
+                }
             }
-            else if (!servoWristPosition && gamepad2.y){
-                servoWrist.setPosition(.265);
-                servoWristPosition = true;
-            }
+            lastY = gamepad2.y;
 
             // Claw Controls
             lbPress = gamepad2.left_bumper;
@@ -162,10 +164,10 @@ public class TrevorTeleop extends LinearOpMode {
                 rbToggle = !rbToggle;
                 lbToggle = false;
             }
-            if (lbPress) {
+            if (lbToggle) {
                 servoWheel1.setPower(1);
                 servoWheel2.setPower(-1);
-            } else if (rbPress) {
+            } else if (rbToggle) {
                 servoWheel1.setPower(-1);
                 servoWheel2.setPower(1);
             } else {
