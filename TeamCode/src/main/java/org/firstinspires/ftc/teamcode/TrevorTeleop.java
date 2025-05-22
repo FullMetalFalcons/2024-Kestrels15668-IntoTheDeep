@@ -14,8 +14,7 @@ public class TrevorTeleop extends LinearOpMode {
     // TODO: Uncomment the following line if you are using servos
     Servo servoWrist;
     CRServo servoWheel1, servoWheel2;
-    double servoWheelPower;
-    boolean servoWristPosition;
+    boolean servoWristPosition, lbPress, rbPress, lbToggle, rbToggle, prevLbPress, prevRbPress;
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
 
@@ -73,8 +72,14 @@ public class TrevorTeleop extends LinearOpMode {
         motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
+        // Init positions
         servoWrist.setPosition(0.229);
+        lbPress = false;
+        rbPress = false;
+        lbToggle = false;
+        rbToggle = false;
+        prevLbPress = false;
+        prevRbPress = false;
 
         // The program will pause here until the Play icon is pressed on the Driver Station
         waitForStart();
@@ -91,6 +96,7 @@ public class TrevorTeleop extends LinearOpMode {
             powerX = gamepad1.left_stick_x;
             powerY = -gamepad1.left_stick_y;
 
+            // Split yaw controls
             if (gamepad1.right_stick_x != 0) {
                 powerAng = -gamepad1.right_stick_x;
             } else {
@@ -123,11 +129,14 @@ public class TrevorTeleop extends LinearOpMode {
 
 
             // Operator Controls
+
+            // Worm Gear Controls
             if (motorArm.getCurrentPosition() > -2584) {
                 motorArm.setPower(-gamepad2.right_stick_y);
             } else {
                 motorArm.setPower(0);
             }
+            // Slide Controls
             motorSlide.setPower(gamepad2.left_stick_y);
 
             // Wrist Controls
@@ -140,20 +149,31 @@ public class TrevorTeleop extends LinearOpMode {
                 servoWristPosition = true;
             }
 
-
             // Claw Controls
-            if (gamepad2.left_bumper) {
-                servoWheelPower = 1;
-            }
-            else if (gamepad2.right_bumper) {
-                servoWheelPower = -1;
-            }
-            else {
-                servoWheelPower = 0.0;
-            }
-            servoWheel1.setPower(servoWheelPower);
-            servoWheel2.setPower(-servoWheelPower);
+            lbPress = gamepad2.left_bumper;
+            rbPress = gamepad2.right_bumper;
 
+            if (lbPress && !prevLbPress) {
+                lbToggle = !lbToggle;
+                rbToggle = false;
+            } // lb toggle
+            if (rbPress && !prevRbPress) {
+                rbToggle = !rbToggle;
+                lbToggle = false;
+            } // rb toggle
+
+            if (lbPress) {
+                servoWheel1.setPower(1);
+                servoWheel2.setPower(-1);
+            } else if (rbPress) {
+                servoWheel1.setPower(-1);
+                servoWheel2.setPower(1);
+            } else {
+                servoWheel1.setPower(0);
+                servoWheel2.setPower(0);
+            }
+            prevLbPress = lbPress;
+            prevRbPress = rbPress;
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed
