@@ -136,8 +136,12 @@ public class TrevorTeleop extends LinearOpMode {
             } else {
                 motorArm.setPower(0);
             }
+
             // Slide Controls
             motorSlide.setPower(gamepad2.left_stick_y);
+            //if (motorSlide.getCurrentPosition() > 0 && motorArm.getCurrentPosition() > -500) {
+            //    motorSlide.setPower(1);
+            //}
 
             // Wrist Controls
             if (gamepad2.y && !lastY) {
@@ -185,6 +189,7 @@ public class TrevorTeleop extends LinearOpMode {
             //telemetry.addData("Label", "Information");
             telemetry.addData("wristPosition", servoWrist.getPosition());
             telemetry.addData("armPosition", motorArm.getCurrentPosition());
+            telemetry.addData("slidePosition", motorSlide.getCurrentPosition());
 
             telemetry.update();
 
