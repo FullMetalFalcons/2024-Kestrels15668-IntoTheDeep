@@ -131,17 +131,22 @@ public class TrevorTeleop extends LinearOpMode {
             // Operator Controls
 
             // Worm Gear Controls
-            if (motorArm.getCurrentPosition() > -2584) {
+            if (motorArm.getCurrentPosition() < 7280) {
                 motorArm.setPower(-gamepad2.right_stick_y);
             } else {
-                motorArm.setPower(0);
+                motorArm.setPower(-0.2);
             }
 
             // Slide Controls
-            motorSlide.setPower(gamepad2.left_stick_y);
-            //if (motorSlide.getCurrentPosition() > 0 && motorArm.getCurrentPosition() > -500) {
-            //    motorSlide.setPower(1);
-            //}
+            if (motorSlide.getCurrentPosition() > -100) {
+                motorSlide.setPower(-0.1);
+            } else if (motorSlide.getCurrentPosition() < -1840 && motorArm.getCurrentPosition() < 4500) {
+                motorSlide.setPower(0.5);
+            } else if (motorSlide.getCurrentPosition() < -3200) {
+                motorSlide.setPower(0.1);
+            } else {
+                motorSlide.setPower(gamepad2.left_stick_y);
+            }
 
             // Wrist Controls
             if (gamepad2.y && !lastY) {
@@ -149,7 +154,7 @@ public class TrevorTeleop extends LinearOpMode {
                     servoWrist.setPosition(.317);
                     servoWristPosition = false;
                 } else {
-                    servoWrist.setPosition(.265);
+                    servoWrist.setPosition(.280);
                     servoWristPosition = true;
                 }
             }
