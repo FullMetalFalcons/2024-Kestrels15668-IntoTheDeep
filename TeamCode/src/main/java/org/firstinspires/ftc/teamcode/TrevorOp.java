@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp
-public class TrevorTeleop extends LinearOpMode {
+public class TrevorOp extends LinearOpMode {
     //Initialize motors, servos, sensors, imus, etc.
     DcMotorEx motorLF, motorRF, motorLB, motorRB, motorArm, motorSlide;
     // TODO: Uncomment the following line if you are using servos
