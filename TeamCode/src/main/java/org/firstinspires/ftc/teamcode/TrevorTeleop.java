@@ -152,16 +152,16 @@ public class TrevorTeleop extends LinearOpMode {
             // Claw Controls
             lbPress = gamepad2.left_bumper;
             rbPress = gamepad2.right_bumper;
-
+            // lb toggle
             if (lbPress && !prevLbPress) {
                 lbToggle = !lbToggle;
                 rbToggle = false;
-            } // lb toggle
+            }
+            // rb toggle
             if (rbPress && !prevRbPress) {
                 rbToggle = !rbToggle;
                 lbToggle = false;
-            } // rb toggle
-
+            }
             if (lbPress) {
                 servoWheel1.setPower(1);
                 servoWheel2.setPower(-1);
