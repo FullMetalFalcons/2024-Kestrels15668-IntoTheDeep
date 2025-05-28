@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
 @TeleOp
 public class TrevorOp extends LinearOpMode {
@@ -14,7 +15,7 @@ public class TrevorOp extends LinearOpMode {
     // TODO: Uncomment the following line if you are using servos
     Servo servoWrist;
     CRServo servoWheel1, servoWheel2;
-    boolean servoWristPosition, lbPress, rbPress, lbToggle, rbToggle, prevLbPress, prevRbPress, lastY;
+    double servoWristPosition, armMin, armMax1, armMax2;
     public static MecanumDrive.Params DRIVE_PARAMS = new MecanumDrive.Params();
 
 
@@ -52,14 +53,13 @@ public class TrevorOp extends LinearOpMode {
         motorLB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motorRF.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         motorRB.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motorArm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        motorSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         //This makes the wheels tense up and stay in position when it is not moving, opposite is FLOAT
         motorLF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorLB.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorRF.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorRB.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
         motorArm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         motorSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
@@ -69,17 +69,12 @@ public class TrevorOp extends LinearOpMode {
         motorLB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRF.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         motorRB.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motorSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        // Init positions
-        servoWrist.setPosition(0.229);
-        lbPress = false;
-        rbPress = false;
-        lbToggle = false;
-        rbToggle = false;
-        prevLbPress = false;
-        prevRbPress = false;
+        armMin = 0.229;
+        armMax1 = 0.317;
+        armMax2 = 0.3655;
+
+        servoWrist.setPosition(armMin);
 
         // The program will pause here until the Play icon is pressed on the Driver Station
         waitForStart();
@@ -96,11 +91,10 @@ public class TrevorOp extends LinearOpMode {
             powerX = gamepad1.left_stick_x;
             powerY = -gamepad1.left_stick_y;
 
-            // Split yaw controls
             if (gamepad1.right_stick_x != 0) {
                 powerAng = -gamepad1.right_stick_x;
             } else {
-                powerAng = -gamepad2.right_stick_x/10;
+                powerAng = -gamepad2.right_stick_x;
             }
 
             // Perform vector math to determine the desired powers for each wheel
@@ -129,62 +123,42 @@ public class TrevorOp extends LinearOpMode {
 
 
             // Operator Controls
-
-            // Worm Gear Controls
-            if (motorArm.getCurrentPosition() < 7280) {
-                motorArm.setPower(-gamepad2.right_stick_y);
-            } else {
-                motorArm.setPower(-0.2);
-            }
-
-            // Slide Controls
-            if (motorSlide.getCurrentPosition() > -100) {
-                motorSlide.setPower(-0.1);
-            } else if (motorSlide.getCurrentPosition() < -1840 && motorArm.getCurrentPosition() < 4500) {
-                motorSlide.setPower(0.5);
-            } else if (motorSlide.getCurrentPosition() < -3200) {
-                motorSlide.setPower(0.1);
-            } else {
-                motorSlide.setPower(gamepad2.left_stick_y);
-            }
+            motorArm.setPower(-gamepad2.left_stick_y);
+            motorSlide.setPower(gamepad2.right_stick_y);
 
             // Wrist Controls
-            if (gamepad2.y && !lastY) {
-                if (servoWristPosition) {
-                    servoWrist.setPosition(.317);
-                    servoWristPosition = false;
-                } else {
-                    servoWrist.setPosition(.280);
-                    servoWristPosition = true;
-                }
+            if (gamepad2.left_trigger > 0) {
+                servoWristPosition -= gamepad2.left_trigger / 1000;
             }
-            lastY = gamepad2.y;
+            else if (gamepad2.right_trigger > 0) {
+                servoWristPosition += gamepad2.right_trigger / 1000;
+            }
+            servoWrist.setPosition(servoWristPosition);
+
+            telemetry.addData("ServoPosition", servoWristPosition);
+            telemetry.addData("PhysicalServoPosition", servoWrist.getPosition());
 
             // Claw Controls
-            lbPress = gamepad2.left_bumper;
-            rbPress = gamepad2.right_bumper;
-            // lb toggle
-            if (lbPress && !prevLbPress) {
-                lbToggle = !lbToggle;
-                rbToggle = false;
-            }
-            // rb toggle
-            if (rbPress && !prevRbPress) {
-                rbToggle = !rbToggle;
-                lbToggle = false;
-            }
-            if (lbToggle) {
+            if (gamepad2.left_bumper) {
                 servoWheel1.setPower(1);
                 servoWheel2.setPower(-1);
-            } else if (rbToggle) {
+            }
+            else if (gamepad2.right_bumper) {
                 servoWheel1.setPower(-1);
                 servoWheel2.setPower(1);
-            } else {
-                servoWheel1.setPower(0);
-                servoWheel2.setPower(0);
             }
-            prevLbPress = lbPress;
-            prevRbPress = rbPress;
+            else {
+                servoWheel1.setPower(0);
+                servoWheel2.setPower(-0);
+            }
+
+            if (servoWristPosition <= armMin) {
+                servoWristPosition = armMin;
+            }
+            if (servoWristPosition >= armMax1) {
+                servoWristPosition = armMax1;
+            }
+
 
             // If you want to print information to the Driver Station, use telemetry
             // addData() lets you give a string which is automatically followed by a ":" when printed
@@ -192,9 +166,7 @@ public class TrevorOp extends LinearOpMode {
             // update() only needs to be run once and will "push" all of the added data
 
             //telemetry.addData("Label", "Information");
-            telemetry.addData("wristPosition", servoWrist.getPosition());
-            telemetry.addData("armPosition", motorArm.getCurrentPosition());
-            telemetry.addData("slidePosition", motorSlide.getCurrentPosition());
+            telemetry.addData("Arm", motorSlide.getCurrentPosition());
 
             telemetry.update();
 

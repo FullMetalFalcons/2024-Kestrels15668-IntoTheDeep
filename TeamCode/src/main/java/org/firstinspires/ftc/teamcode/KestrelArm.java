@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -16,43 +17,68 @@ import java.util.concurrent.TimeUnit;
 
 public class KestrelArm {
 
-    public DcMotorEx Tower, Slide, Arm;
-    public static Servo Claw, ClawRotator;
+    public DcMotorEx motorArm, motorSlide;
+    public Servo servoWrist;
+    public CRServo servoWheel1, servoWheel2;
+
 
     public KestrelArm(HardwareMap hardwareMap, Telemetry telemetry) {
-        Tower = (DcMotorEx) hardwareMap.dcMotor.get("lift");
-        Slide = (DcMotorEx) hardwareMap.dcMotor.get("slide");
-        Arm = (DcMotorEx) hardwareMap.dcMotor.get("pivot");
+        motorSlide = (DcMotorEx) hardwareMap.dcMotor.get("Slide");
+        motorArm = (DcMotorEx) hardwareMap.dcMotor.get("Wormgear");
 
         //Slide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        Claw = (Servo) hardwareMap.servo.get("claw");
-        ClawRotator = (Servo) hardwareMap.servo.get("ClawRotator");
+        servoWrist = (Servo) hardwareMap.servo.get("Wrist");
+        servoWheel1 = (CRServo) hardwareMap.servo.get("Wheel1");
+        servoWheel2 = (CRServo) hardwareMap.servo.get("Wheel2");
 
         // Set Zero Power Behavior
-        Tower.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Slide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        Arm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorArm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        motorSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         // Reset Encoders
-        Tower.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        Slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        Arm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motorArm.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        motorSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         // Set Run Mode
-        Tower.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        Arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorArm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motorSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 
     //Power Control Methods (For Manual Control, used for mainly testing)
 
-    public void setLiftPower(double power) {
-        Tower.setPower(power); // Move lift up/down
+    public class ArmtoPosition implements Action {
+        private int TargetArmTicks;
+        public ArmtoPosition(int ArmTicks) {
+            super();
+            TargetArmTicks = ArmTicks;
+        }
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                motorArm.setTargetPosition(TargetArmTicks);
+                motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                initialized = true;
+            }
+            if (motorArm.isBusy()) {
+                motorArm.setPower(1.0);
+                return true;
+            } else {
+                motorArm.setPower(0);
+                return false;
+            }
+        }
     }
 
+    public ArmtoPosition armtoPosition(int ArmTicks) {
+        return new ArmtoPosition(ArmTicks);
+
+    }
+/*
     public void setSlidePower(double power) {
-        Slide.setPower(power); // Move slide in/out
+        motorSlide.setPower(power); // Move slide in/out
     }
 
     //Position Control Actions (For Auto)
@@ -79,27 +105,23 @@ public class KestrelArm {
     public static class ArmRotatorToPosition implements Action {
         private final int rotatorTarget;
         private final KestrelArm arm;
-        private final long timeLimitNs;
-        private long startTimeNs = 0;
         private boolean started = false;
 
         //Rotates Arm To Position
-        public ArmRotatorToPosition(KestrelArm arm, int rotTarget, double seconds) {
+        public ArmRotatorToPosition(KestrelArm arm, int rotTarget) {
             this.arm = arm;
             this.rotatorTarget = rotTarget;
-            this.timeLimitNs = TimeUnit.MILLISECONDS.toNanos((long) (seconds * 1000));
         }
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!started) {
-                startTimeNs = System.nanoTime();
                 started = true;
-                arm.Arm.setTargetPosition(rotatorTarget);
-                arm.Arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.Arm.setPower(1);
+                arm.motorArm.setTargetPosition(rotatorTarget);
+                arm.motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm.motorArm.setPower(1);
             }
-            return arm.Arm.isBusy();
+            return arm.motorArm.isBusy();
         }
     }
 
@@ -114,7 +136,7 @@ public class KestrelArm {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            arm.Claw.setPosition(position);
+            arm.servoWrist.setPosition(position);
             return false; // This action runs instantly
         }
     }
@@ -134,18 +156,6 @@ public class KestrelArm {
             this.timeLimitNs = TimeUnit.MILLISECONDS.toNanos((long) (seconds * 1000));
         }
 
-        @Override
-        public boolean run(@NonNull TelemetryPacket packet) {
-            if (!started) {
-                startTimeNs = System.nanoTime();
-                started = true;
-                arm.Tower.setTargetPosition(targetPosition);
-                arm.Tower.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.Tower.setPower(1);
-            }
-            return arm.Tower.isBusy() && (System.nanoTime() - startTimeNs < timeLimitNs);
-        }
-    }
 
     public static class SlideToPosition implements Action {
         private final int targetPosition;
@@ -165,11 +175,11 @@ public class KestrelArm {
             if (!started) {
                 startTimeNs = System.nanoTime();
                 started = true;
-                arm.Slide.setTargetPosition(targetPosition);
-                arm.Slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                arm.Slide.setPower(1);
+                arm.motorSlide.setTargetPosition(targetPosition);
+                arm.motorSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                arm.motorSlide.setPower(1);
             }
-            if (arm.Slide.isBusy() /*&& (System.nanoTime() - startTimeNs < timeLimitNs)*/) {
+            if (arm.motorSlide.isBusy() && (System.nanoTime() - startTimeNs < timeLimitNs)) {
                 return true;
             }
             else {
@@ -177,4 +187,5 @@ public class KestrelArm {
             }
         }
     }
+ */
 }
