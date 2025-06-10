@@ -31,11 +31,11 @@ public class KestrelArm {
         motorSlide = (DcMotorEx) hardwareMap.dcMotor.get("Slide");
         motorArm = (DcMotorEx) hardwareMap.dcMotor.get("Wormgear");
 
-        //Slide.setDirection(DcMotorSimple.Direction.REVERSE);
+        motorSlide.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        servoWrist = (Servo) hardwareMap.servo.get("Wrist");
-        servoWheel1 = (CRServo) hardwareMap.crservo.get("Wheel1");
-        servoWheel2 = (CRServo) hardwareMap.crservo.get("Wheel2");
+        servoWrist = hardwareMap.servo.get("Wrist");
+        servoWheel1 = hardwareMap.crservo.get("Wheel1");
+        servoWheel2 = hardwareMap.crservo.get("Wheel2");
 
         // Set Zero Power Behavior
         motorArm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
