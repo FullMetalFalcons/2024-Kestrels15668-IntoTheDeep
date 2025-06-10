@@ -21,6 +21,11 @@ public class KestrelArm {
     public Servo servoWrist;
     public CRServo servoWheel1, servoWheel2;
 
+    public final int INTAKE_IN = -1;
+    public final int INTAKE_OUT = 1;
+    public final double WRIST_OUT = .317;
+    public final double WRIST_IN = .280;
+
 
     public KestrelArm(HardwareMap hardwareMap, Telemetry telemetry) {
         motorSlide = (DcMotorEx) hardwareMap.dcMotor.get("Slide");
@@ -29,8 +34,8 @@ public class KestrelArm {
         //Slide.setDirection(DcMotorSimple.Direction.REVERSE);
 
         servoWrist = (Servo) hardwareMap.servo.get("Wrist");
-        servoWheel1 = (CRServo) hardwareMap.servo.get("Wheel1");
-        servoWheel2 = (CRServo) hardwareMap.servo.get("Wheel2");
+        servoWheel1 = (CRServo) hardwareMap.crservo.get("Wheel1");
+        servoWheel2 = (CRServo) hardwareMap.crservo.get("Wheel2");
 
         // Set Zero Power Behavior
         motorArm.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -47,35 +52,95 @@ public class KestrelArm {
 
     //Power Control Methods (For Manual Control, used for mainly testing)
 
-    public class ArmtoPosition implements Action {
-        private int TargetArmTicks;
-        public ArmtoPosition(int ArmTicks) {
+    public class ArmSlideToPosition implements Action {
+        // Use constructor parameter to set target position
+        private int targetArmPositionTicks;
+        private int targetSlidePositionTicks;
+        private int endErrorTicks;
+        public ArmSlideToPosition(int armPosTicks, int slidePosTicks, int errorToEndTicks) {
             super();
-            TargetArmTicks = ArmTicks;
+            // Convert target degrees to target ticks
+            targetArmPositionTicks = (armPosTicks);
+
+            // Convert target inches to target ticks
+            targetSlidePositionTicks = (slidePosTicks);
+
+            // Once our arm and slide have less error than this, the
+            //   next action will begin (as the arm and slide fine
+            //   tune themselves in parallel)
+            endErrorTicks = errorToEndTicks;
         }
+
         private boolean initialized = false;
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
+
             if (!initialized) {
-                motorArm.setTargetPosition(TargetArmTicks);
+                motorArm.setTargetPosition(targetArmPositionTicks);
                 motorArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                packet.put("Arm isBusy", motorArm.isBusy());
+
+                motorSlide.setTargetPosition(targetSlidePositionTicks);
+                motorSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                packet.put("Slide isBusy", motorSlide.isBusy());
                 initialized = true;
             }
-            if (motorArm.isBusy()) {
-                motorArm.setPower(1.0);
+
+
+            // Find out how far each mechanism is from their desired positions
+            int armErrorTicks = Math.abs(motorArm.getCurrentPosition() - motorArm.getTargetPosition());
+            int slideErrorTicks = Math.abs(motorSlide.getCurrentPosition() - motorSlide.getTargetPosition());
+
+            //TODO Add limit checks
+            if ((armErrorTicks > endErrorTicks && motorArm.isBusy()) || (slideErrorTicks > endErrorTicks && motorSlide.isBusy())) {
+                // Returning true will run the action again
+                motorArm.setPower(1);
+                motorSlide.setPower(1);
                 return true;
             } else {
-                motorArm.setPower(0);
+                // Returning false will end the action
+                //Arm.setPower(0);
+                //Slide.setPower(0);
                 return false;
             }
         }
     }
-
-    public ArmtoPosition armtoPosition(int ArmTicks) {
-        return new ArmtoPosition(ArmTicks);
-
+    public ArmSlideToPosition armToPosition(int targetArmTicks, int targetSlideTicks, int errorToEndTicks) {
+        return new ArmSlideToPosition(targetArmTicks, targetSlideTicks, errorToEndTicks);
     }
+    public class SetIntake implements Action {
+        // Use constructor parameter to set target position
+        private int desiredIntakeSpeed;
+        public SetIntake(int intakeSpeed) {
+            super();
+            desiredIntakeSpeed = intakeSpeed;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            servoWheel1.setPower(-desiredIntakeSpeed);
+            servoWheel2.setPower(desiredIntakeSpeed);
+            return false;
+        }
+    }
+    public SetIntake setIntake(int intakeSpeed) { return new SetIntake(intakeSpeed); }
+
+
+    public class WristToPosition implements Action {
+        // Use constructor parameter to set target position
+        private double targetWristPosition;
+        public WristToPosition(double wristPos) {
+            super();
+            targetWristPosition = wristPos;
+        }
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            servoWrist.setPosition(targetWristPosition);
+            return false;
+        }
+    }
+    public WristToPosition wristToPosition(double wristPos) { return new WristToPosition(wristPos); }
+
 /*
     public void setSlidePower(double power) {
         motorSlide.setPower(power); // Move slide in/out
