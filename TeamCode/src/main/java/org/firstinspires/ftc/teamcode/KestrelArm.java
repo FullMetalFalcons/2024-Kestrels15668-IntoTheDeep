@@ -109,6 +109,8 @@ public class KestrelArm {
     public ArmSlideToPosition armToPosition(int targetArmTicks, int targetSlideTicks, int errorToEndTicks) {
         return new ArmSlideToPosition(targetArmTicks, targetSlideTicks, errorToEndTicks);
     }
+
+
     public class SetIntake implements Action {
         // Use constructor parameter to set target position
         private int desiredIntakeSpeed;
