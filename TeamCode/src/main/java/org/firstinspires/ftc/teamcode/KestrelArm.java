@@ -26,6 +26,10 @@ public class KestrelArm {
     public final double WRIST_OUT = .317;
     public final double WRIST_IN = .280;
 
+    final double SLIDE_INCHES_PER_TICK = 0.008192245;
+    final double ARM_DEGREES_PER_TICK = 0.017506321;
+    final double INITAL_ARM_TICKS = 2190;
+
 
     public KestrelArm(HardwareMap hardwareMap, Telemetry telemetry) {
         motorSlide = (DcMotorEx) hardwareMap.dcMotor.get("Slide");
@@ -57,13 +61,13 @@ public class KestrelArm {
         private int targetArmPositionTicks;
         private int targetSlidePositionTicks;
         private int endErrorTicks;
-        public ArmSlideToPosition(int armPosTicks, int slidePosTicks, int errorToEndTicks) {
+        public ArmSlideToPosition(double armPosDegrees, double slidePosInches, int errorToEndTicks) {
             super();
             // Convert target degrees to target ticks
-            targetArmPositionTicks = (armPosTicks);
+            targetArmPositionTicks = (int) (armPosDegrees/ARM_DEGREES_PER_TICK + INITAL_ARM_TICKS);
 
             // Convert target inches to target ticks
-            targetSlidePositionTicks = (slidePosTicks);
+            targetSlidePositionTicks = (int) (slidePosInches/SLIDE_INCHES_PER_TICK);
 
             // Once our arm and slide have less error than this, the
             //   next action will begin (as the arm and slide fine
@@ -106,8 +110,8 @@ public class KestrelArm {
             }
         }
     }
-    public ArmSlideToPosition armToPosition(int targetArmTicks, int targetSlideTicks, int errorToEndTicks) {
-        return new ArmSlideToPosition(targetArmTicks, targetSlideTicks, errorToEndTicks);
+    public ArmSlideToPosition armToPosition(double targetArmDegrees, double targetSlideInches, int errorToEndTicks) {
+        return new ArmSlideToPosition(targetArmDegrees, targetSlideInches, errorToEndTicks);
     }
 
 

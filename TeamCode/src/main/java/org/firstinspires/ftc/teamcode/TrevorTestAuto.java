@@ -69,10 +69,12 @@ public class TrevorTestAuto extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         testTrajectory,
-                        arm.armToPosition(600,1600,10),
-                        arm.wristToPosition(.317),
+                        arm.armToPosition(45,7.5,10),
+                        arm.wristToPosition(arm.WRIST_OUT),
                         new SleepAction(1),
-                        arm.setIntake(-1),
+                        arm.setIntake(arm.INTAKE_IN),
+                        new SleepAction(1),
+                        arm.setIntake(arm.INTAKE_OUT),
                         new SleepAction(1),
                         arm.setIntake(0)
                 )
