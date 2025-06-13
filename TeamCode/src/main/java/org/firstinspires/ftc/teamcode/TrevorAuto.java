@@ -24,7 +24,6 @@ public class TrevorAuto extends LinearOpMode {
         KestrelArm arm = new KestrelArm(hardwareMap, telemetry);
         Action moveToSpike1;
         Action moveToSpike2;
-        Action moveToHome;
         Action moveToBasket0;
         Action moveToBasket1;
         Action moveToBasket2;
@@ -35,23 +34,17 @@ public class TrevorAuto extends LinearOpMode {
         moveToSpike2 = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(-25,19.5))
                 .build();
-        moveToHome = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(0,0))
-                .build();
         moveToBasket0 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(135))
                 .strafeTo(new Vector2d(-16.5,7))
-                //.strafeToLinearHeading(new Vector2d(-16.5,7),Math.toRadians(135))
                 .build();
         moveToBasket1 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(135))
                 .strafeTo(new Vector2d(-16.5,7))
-                //.strafeToLinearHeading(new Vector2d(-16.5,7),Math.toRadians(135))
                 .build();
         moveToBasket2 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(135))
                 .strafeTo(new Vector2d(-16.5,7))
-                //.strafeToLinearHeading(new Vector2d(-16.5,7),Math.toRadians(135))
                 .build();
 
 
@@ -106,11 +99,12 @@ public class TrevorAuto extends LinearOpMode {
                     new SleepAction(0.5),
                     arm.setIntake(0),
                     arm.armToPosition(70,0,2500),
-                    arm.armToPosition(0,0,3000),
+                    arm.armToPosition(0,0,3000)
 
-                    new SleepAction(1),
+                    /*new SleepAction(1),
                     arm.wristToPosition(0.229),
                     arm.armToPosition(0,0,5)
+                     */
                 )
         );
     }
