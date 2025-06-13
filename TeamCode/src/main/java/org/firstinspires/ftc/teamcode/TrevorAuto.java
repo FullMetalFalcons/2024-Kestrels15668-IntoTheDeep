@@ -25,19 +25,30 @@ public class TrevorAuto extends LinearOpMode {
         Action moveToSpike1;
         Action moveToSpike2;
         Action moveToHome;
-        Action moveToBasket;
+        Action moveToBasket0;
+        Action moveToBasket1;
+        Action moveToBasket2;
 
         moveToSpike1 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(-24,19.5))
-                .strafeTo(new Vector2d(-14,19.5))
+                .strafeTo(new Vector2d(-14.5,19.5))
                 .build();
         moveToSpike2 = drive.actionBuilder(drive.pose)
-                .strafeTo(new Vector2d(-24,19.5))
+                .strafeTo(new Vector2d(-25,19.5))
                 .build();
         moveToHome = drive.actionBuilder(drive.pose)
                 .strafeTo(new Vector2d(0,0))
                 .build();
-        moveToBasket = drive.actionBuilder(drive.pose)
+        moveToBasket0 = drive.actionBuilder(drive.pose)
+                .turn(Math.toRadians(135))
+                .strafeTo(new Vector2d(-16.5,7))
+                //.strafeToLinearHeading(new Vector2d(-16.5,7),Math.toRadians(135))
+                .build();
+        moveToBasket1 = drive.actionBuilder(drive.pose)
+                .turn(Math.toRadians(135))
+                .strafeTo(new Vector2d(-16.5,7))
+                //.strafeToLinearHeading(new Vector2d(-16.5,7),Math.toRadians(135))
+                .build();
+        moveToBasket2 = drive.actionBuilder(drive.pose)
                 .turn(Math.toRadians(135))
                 .strafeTo(new Vector2d(-16.5,7))
                 //.strafeToLinearHeading(new Vector2d(-16.5,7),Math.toRadians(135))
@@ -50,25 +61,56 @@ public class TrevorAuto extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                     arm.wristToPosition(0.229),
-                    arm.armToPosition(0,0,10),
+                    arm.armToPosition(0,0,500),
                     arm.wristToPosition(0.280),
-                    new SleepAction(1),
-                    moveToSpike1,
-                    new SleepAction(1),
-                    arm.armToPosition(0,8.5,5),
-                    arm.setIntake(arm.INTAKE_IN),
-                    arm.armToPosition(-10,8.5,10000),
-                    new SleepAction(1),
-                    arm.setIntake(0),
-                    arm.armToPosition(0,0,5),
-                    new SleepAction(1),
-                    moveToBasket,
-                    arm.armToPosition(70,0,1000),
-                    arm.armToPosition(70,20,5),
-                    arm.setIntake(arm.INTAKE_OUT),
-                    new SleepAction(1),
-                    arm.setIntake(0)
 
+                    moveToBasket0,
+                    arm.armToPosition(70,0,1000),
+                    arm.armToPosition(70,22,20),
+                    arm.setIntake(arm.INTAKE_OUT),
+                    new SleepAction(0.5),
+                    arm.setIntake(0),
+                    arm.armToPosition(70,0,1000),
+                    arm.armToPosition(0,0,4000),
+
+                    moveToSpike1,
+                    arm.armToPosition(-5,8,20),
+                    arm.setIntake(arm.INTAKE_IN),
+                    arm.armToPosition(-15,8,10000),
+                    new SleepAction(.75),
+                    arm.setIntake(0),
+                    arm.armToPosition(0,0,100),
+
+                    moveToBasket1,
+                    arm.armToPosition(70,0,1000),
+                    arm.armToPosition(70,22,20),
+                    arm.setIntake(arm.INTAKE_OUT),
+                    new SleepAction(0.5),
+                    arm.setIntake(0),
+                    arm.armToPosition(70,0,2500),
+                    arm.armToPosition(0,0,4000),
+
+
+                    moveToSpike2,
+                    arm.armToPosition(-5,8,20),
+                    arm.setIntake(arm.INTAKE_IN),
+                    arm.armToPosition(-15,8,10000),
+                    new SleepAction(.75),
+                    arm.setIntake(0),
+                    arm.armToPosition(0,0,100),
+
+                    moveToBasket2,
+                    arm.armToPosition(70,0,2500),
+                    arm.armToPosition(70,22,20),
+                    arm.setIntake(arm.INTAKE_OUT),
+                    new SleepAction(0.5),
+                    arm.setIntake(0),
+                    arm.armToPosition(70,0,2500),
+                    arm.armToPosition(0,0,3000),
+
+                    new SleepAction(1),
+                    arm.wristToPosition(0.229),
+                    arm.armToPosition(0,0,5)
                 )
         );
     }
